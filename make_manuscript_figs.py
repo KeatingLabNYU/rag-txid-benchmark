@@ -477,7 +477,7 @@ for i, row in t4p.iterrows():
 
 ax.set_yticks(np.arange(len(t4p)))
 ax.set_yticklabels(t4p["category"].values, fontsize=FS)
-ax.set_xlabel("Major-error rate per 100 judged generations", fontsize=FS)
+ax.set_xlabel("Major-error rate per 100 judge records", fontsize=FS)
 ax.tick_params(axis="x", labelsize=FS)
 ax.set_xlim(0, 30)   # extended for legend clearance
 ax.xaxis.grid(True, color=LGRAY, lw=0.5, zorder=0); ax.set_axisbelow(True)
