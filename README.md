@@ -90,7 +90,7 @@ The script reads data from its own directory and writes `figures/manuscript/` an
 RAG_DATA_DIR=/path/to/data RAG_OUT_DIR=/path/to/output Rscript RAG_TxID_analysis_FULL.R
 ```
 
-The script auto-selects the PUBLICATION dataset when present; the error taxonomy (Section 05 / Figure 7 / Table 4) and retrieval audit and sensitivity analyses (Sections 06–07) require the complete PUBLICATION file.
+The script auto-selects the first available dataset from a priority list (complete dataset preferred; FABLE subset reproduces Sections 01–04 only). The error taxonomy (Section 05 / Figure 7 / Table 4) and retrieval audit and sensitivity analyses (Sections 06–07) require the complete dataset (`all_models_rag_non_rag_judged.csv`).
 
 ### Figures (Python)
 
@@ -100,7 +100,7 @@ pip install matplotlib numpy pandas scipy
 python make_manuscript_figs.py
 ```
 
-Outputs `figures/manuscript/Fig1_*.{pdf,png}` … `Fig7_*.{pdf,png}` at 600 dpi.
+Outputs `figures/manuscript/Fig1.{pdf,png}` … `Fig7.{pdf,png}` at 600 dpi.
 
 ### RAG pipeline (Python)
 
@@ -141,7 +141,8 @@ python methods_scripts/judge_all_models_multidim_csv.py \
 | Models harmed | 37/39 |
 | Competence Paradox (*r*, correctness) | −0.58, *P* = 0.0001 |
 | Grounding Paradox (evidence density *r*) | −0.65, *P* < 0.001 |
-| Sensitivity: good-retrieval cases (7/21) | Δ = −0.204, *P* = 7.2 × 10⁻¹³ |
+| Sensitivity: good-retrieval cases (7/21) | Δ = −0.204, *P* = 0.188 (clustered inference) |
+| Sensitivity: 11-case subset (excl. poor retrieval) | Δ = −0.242, *P* = 0.034 |
 | Human validation (accuracy, Wilcoxon *P*) | Δ = −0.40, *P* = 0.012 |
 | Human–LLM convergent validity (Spearman ρ) | 0.59, *P* = 0.006 |
 | Error profile shift (χ²) | *P* = 8.6 × 10⁻¹⁴ |
