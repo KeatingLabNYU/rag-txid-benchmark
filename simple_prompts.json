@@ -1,0 +1,68 @@
+[
+  {
+    "id": "S-01",
+    "title": "Influenza A isolation & contagiousness",
+    "prompt": "My kidney transplant patient has influenza A. Do we need a private room and how long are they contagious? What should I tell family about masks at home?",
+    "expected_format": ["Isolation/PPE (hospital)", "Home precautions", "Transplant-specific notes (shedding/antivirals)", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-02",
+    "title": "Pneumonia at 3 months post-kidney transplant",
+    "prompt": "Kidney transplant patient with pneumonia 3 months after surgery. What organisms are most likely? Is this more community or opportunistic?",
+    "expected_format": ["Likely pathogens (1–6 months)", "Sources (donor/nosocomial/community/opportunistic)", "Risk modifiers (rejection, IS level)", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-03",
+    "title": "FUO workup at day 30 after liver transplant",
+    "prompt": "Liver transplant patient nearly 1 month out has persistent fevers and no source. What initial workup would you start before biopsy?",
+    "expected_format": ["Immediate vs deferred tests", "Specimens & collection devices", "Typical turnaround times", "Escalation criteria (PCR/mNGS/BAL/biopsy)", "Infection control during workup", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-04",
+    "title": "Best test for CMV (kidney SOT)",
+    "prompt": "For CMV in a kidney transplant patient, what’s the most reliable test to order? Is plasma PCR enough or do I need tissue?",
+    "expected_format": ["Primary test & rationale", "Specimen (plasma vs whole blood) & timing", "When tissue is needed", "Alternatives (e.g., pp65) if applicable", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-05",
+    "title": "Treating Pneumocystis pneumonia",
+    "prompt": "Post-transplant patient with PJP pneumonia. What’s the treatment and dose? How long, and when do we add steroids?",
+    "expected_format": ["First-line regimen with dosing", "Renal/hepatic adjustments", "Duration & IV-to-PO switch", "Steroid indications/dosing", "Monitoring & toxicities", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-06",
+    "title": "Aspergillosis when voriconazole isn’t an option",
+    "prompt": "Transplant patient with invasive aspergillosis can’t take voriconazole and is on tacrolimus. What are my options and key drug interactions?",
+    "expected_format": ["Alternative regimens + dosing", "TDM needs", "DDI with CNI/mTOR (mechanism + actions)", "Switch/escalate criteria", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-07",
+    "title": "Adjusting IS for BK viremia",
+    "prompt": "Kidney transplant patient with rising BK viral load — how should I adjust immunosuppression safely? When do you add leflunomide or IVIG?",
+    "expected_format": ["Staged IS adjustment", "Monitoring cadence & thresholds", "Adjunct therapies (criteria)", "Rejection-risk mitigation", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-08",
+    "title": "Influenza A progressing to ARDS",
+    "prompt": "Transplant patient with flu now has ARDS — what are the first steps, and when do we think about ECMO or antivirals?",
+    "expected_format": ["First 24h management bundle", "Escalation triggers (ICU/ECMO)", "Antiviral optimization", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-09",
+    "title": "Prophylaxis & vaccines (kidney SOT)",
+    "prompt": "For kidney transplant recipients, what’s the standard for CMV, PJP, HSV/VZV prophylaxis and influenza/COVID vaccines? Anything we can stop after a certain time?",
+    "expected_format": ["Prophylaxis table (agent/dose/duration start–stop)", "Vaccines (what/when; live vaccine caveats)", "Program notes", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-10",
+    "title": "TB: reportability & precautions",
+    "prompt": "Kidney transplant patient with pulmonary TB — is this reportable, and what should family and staff do for precautions?",
+    "expected_format": ["Reportability & how to verify locally", "Healthcare isolation guidance", "Home/visitor precautions", "Citations", "Confidence"]
+  },
+  {
+    "id": "S-11",
+    "title": "Chagas reactivation after heart transplant",
+    "prompt": "My heart transplant patient’s Trypanosoma cruzi PCR went from 2.5 to 3.8 log10 copies/mL over two weeks. How do I know if this is reactivation, and what’s the standard treatment regimen?",
+    "expected_format": ["Reactivation criteria with numeric thresholds", "Surveillance strategy (tests, cadence, actionable PCR deltas)", "First-line treatment including dosing and duration", "Adjunctive or preventive steps with quantitative targets", "Citations", "Confidence"]
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "A-01",
+    "title": "Managing simultaneous CMV and BK viremia",
+    "prompt": "Kidney SOT (D+/R−) on tac/MMF/pred: CMV 5.0 log10 IU/mL and BK 3.5 log10 copies/mL. How do we adjust immunosuppression to control both without triggering rejection? Discuss sequential vs simultaneous reduction strategies and antiviral choices (valganciclovir vs letermovir).",
+    "expected_format": ["IS strategy (sequential vs simultaneous)", "Antiviral selection & monitoring", "Rejection risk & mitigation", "Citations", "Confidence", "Pathophysiology/Immunology notes"]
+  },
+  {
+    "id": "A-02",
+    "title": "Donor-derived early fungal infection in xenotransplant",
+    "prompt": "Pig-to-human kidney xenotransplant, day 10: fevers + pulmonary nodules. Cultures: Candida parapsilosis; donor perfusate PCR positive for fungal DNA. How to differentiate donor-derived infection from contamination? What diagnostics (histopath, WGS confirmation) and antifungal strategy are supported?",
+    "expected_format": ["DDx donor-derived vs contamination", "Confirmatory diagnostics plan", "Antifungal regimen & duration", "Biosafety/xeno-specific notes", "Citations", "Confidence"]
+  },
+  {
+    "id": "A-03",
+    "title": "CR-Pseudomonas sepsis on ECMO",
+    "prompt": "Liver SOT on VV-ECMO for ARDS now has carbapenem-resistant Pseudomonas septic shock. What are evidence-based options (e.g., ceftolozane/tazobactam, cefiderocol, combos)? Include ECMO dosing considerations and CNI nephrotoxicity risks.",
+    "expected_format": ["Therapy options with rationale", "ECMO PK/PD adjustments", "CNI co-therapy risks", "Citations", "Confidence"]
+  },
+  {
+    "id": "A-04",
+    "title": "Polyviral reactivation on belatacept",
+    "prompt": "Kidney SOT on belatacept+MMF: fever + pancytopenia. PCR: EBV 4.3 log, CMV 3.7 log, HHV-6 2.8 log. How to interpret polyviral reactivation? Which virus likely drives cytopenia? Outline diagnostics and management (BM biopsy, MMF hold, IS conversion).",
+    "expected_format": ["Etiology interpretation", "Diagnostic pathway", "IS adjustments", "Therapeutic plan", "Citations", "Confidence", "Immunology reasoning"]
+  },
+  {
+    "id": "A-05",
+    "title": "Nocardia vs TB diagnostic conflict",
+    "prompt": "Heart SOT, chronic cough, nodular lung lesions. AFB smears positive, MTB PCR negative; cultures later grow Nocardia farcinica. Explain differences between Nocardia and TB in transplant hosts, how to interpret discordant smear/PCR, and outline therapy incl. CNS prophylaxis.",
+    "expected_format": ["Diagnostic distinctions", "Interpretation of smear/PCR discordance", "Therapy (agents/duration)", "CNS imaging/prophylaxis", "Citations", "Confidence"]
+  },
+  {
+    "id": "A-06",
+    "title": "Endemic mycosis after travel",
+    "prompt": "Kidney SOT returns from Arizona with fever/cough. BAL serology positive for Coccidioides, culture negative. Management choice (fluconazole vs amphotericin), duration, and when to resume full IS?",
+    "expected_format": ["Induction/step-down strategy", "Duration & monitoring", "IS resume criteria", "Citations", "Confidence"]
+  },
+  {
+    "id": "A-07",
+    "title": "Adenovirus viremia with graft dysfunction (peds)",
+    "prompt": "Pediatric kidney SOT, 2 months post-tx: rising creatinine, hemorrhagic cystitis, adenovirus PCR 4.0 log. Pathophysiology of adenoviral nephritis, role of cidofovir/brincidofovir, renal-protective strategies, and thresholds to reduce CNIs.",
+    "expected_format": ["Pathophysiology", "Therapy (cidofovir/brincidofovir) & protection", "IS adjustments & thresholds", "Monitoring plan", "Citations", "Confidence"]
+  },
+  {
+    "id": "A-08",
+    "title": "Mixed infections after anti-rejection therapy",
+    "prompt": "After methylpred + thymoglobulin, kidney SOT develops fever, diarrhea, rash. Tests: C. difficile+, Norovirus+, CMV 2.8 log. Prioritize management: infection control, antiviral therapy, microbiota protection, safe IS taper.",
+    "expected_format": ["Prioritization & sequencing", "Therapeutic plan per pathogen", "Infection control bundle", "IS taper plan", "Citations", "Confidence"]
+  },
+  {
+    "id": "A-09",
+    "title": "PERV detection after xenotransplant",
+    "prompt": "Xenotransplant recipient with low-level PERV-A/C qPCR in PBMCs (not plasma). Interpret as contamination vs transient donor DNA vs infection. Outline confirmatory testing (integration assays, RNA seq), biosafety, and reporting.",
+    "expected_format": ["Interpretation framework", "Confirmatory tests", "Biosafety/reporting", "Citations", "Confidence"]
+  },
+  {
+    "id": "A-10",
+    "title": "PML after kidney transplant",
+    "prompt": "Kidney SOT on tac/MMF with subacute confusion and white-matter lesions; CSF JCV PCR positive. Management principles (IS reduction, mirtazapine/IVIG/pembrolizumab), expected recovery, and recurrence risk.",
+    "expected_format": ["Management strategy", "Evidence for adjuncts", "Prognosis & recurrence", "Citations", "Confidence"]
+  }
+]
