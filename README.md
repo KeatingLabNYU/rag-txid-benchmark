@@ -147,10 +147,3 @@ python methods_scripts/judge_all_models_multidim_csv.py \
 | Human–LLM convergent validity (Spearman ρ) | 0.59, *P* = 0.006 |
 | Error profile shift (χ²) | *P* = 8.6 × 10⁻¹⁴ |
 
-## Citation
-
-[TODO: preprint DOI once posted]
-
-## License
-
-[TODO: confirm with team — e.g., MIT for code, CC BY 4.0 for data/manuscript]
