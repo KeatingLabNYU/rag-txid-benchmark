@@ -1,6 +1,12 @@
 # RAG vs No-RAG in Transplant Infectious Disease
 
-Reproducible analysis and manuscript code for a 39-model evaluation of retrieval-augmented generation (RAG) versus direct (no-RAG) generation in transplant infectious disease (Tx-ID), with LLM-judge scoring, blinded clinician validation, and retrieval quality audit.
+Reproducible analysis and manuscript code for a 39-model evaluation of retrieval-augmented generation (RAG) versus direct (no-RAG) generation in transplant infectious disease (Tx-ID), with LLM-judge scoring, masked clinician ratings, and retrieval quality audit.
+
+## Revision (PLOS Digital Health, PDIG-D-26-01326)
+
+The revised manuscript is titled "A Hybrid Retrieval-Augmented Generation Configuration Lowered Clinical Answer Quality Across 39 Language Models". The code for the revision analyses is in [`revision/`](revision/); see [`revision/README.md`](revision/README.md) for the run order. The revision data (deidentified ratings from five evaluators, revised statistics, and the retrieved-passage manifest and audit files) are archived at Zenodo: https://doi.org/10.5281/zenodo.23892698.
+
+The revised analysis averages the three judge ratings within each answer and clusters standard errors by model and by case. It supersedes the inferential results of the original R pipeline below, which treated the three judge ratings of each answer as independent. The original generation, judging, and analysis scripts are kept unchanged for provenance. The comparison is between two complete configurations, which differed in prompts and answer format as well as retrieval.
 
 ## Repository structure
 
@@ -133,17 +139,20 @@ python methods_scripts/judge_all_models_multidim_csv.py \
 
 ## Key results
 
+Revised analysis (output-averaged; standard errors clustered by model and case). Superseded values from the original submission are not reproduced here.
+
 | Finding | Result |
 |---|---|
-| RAG effect on composite quality | *b* = −0.355 [−0.450, −0.260], *P* = 8.6 × 10⁻⁹ |
-| RAG effect on correctness | *b* = −0.196, *P* = 0.003 |
-| Major-error OR (RAG vs No-RAG) | 1.22, *P* = 0.004 |
-| Models harmed | 37/39 |
-| Competence Paradox (*r*, correctness) | −0.58, *P* = 0.0001 |
-| Grounding Paradox (evidence density *r*) | −0.65, *P* < 0.001 |
-| Sensitivity: good-retrieval cases (7/21) | Δ = −0.204, *P* = 0.188 (clustered inference) |
-| Sensitivity: 11-case subset (excl. poor retrieval) | Δ = −0.242, *P* = 0.034 |
-| Human validation (accuracy, Wilcoxon *P*) | Δ = −0.40, *P* = 0.012 |
-| Human–LLM convergent validity (Spearman ρ) | 0.59, *P* = 0.006 |
-| Error profile shift (χ²) | *P* = 8.6 × 10⁻¹⁴ |
+| Composite quality, RAG − No-RAG | −0.355 (95% CI −0.500 to −0.210), *P* < 0.001 |
+| Correctness | −0.196 (95% CI −0.423 to 0.030), *P* = 0.086 |
+| Mean judge major-error flag | +3.4 percentage points (95% CI −4.4 to 11.2), *P* = 0.375 |
+| Models with lower composite quality under RAG | 37/39 |
+| Excluding same-developer judge ratings (294 records) | −0.365 (95% CI −0.513 to −0.216) |
+| Good-retrieval cases (7/21), exploratory | −0.204 (95% CI −0.540 to 0.132), *P* = 0.188 |
+| Excluding severe retrieval failures (11 cases), exploratory | −0.242 (95% CI −0.461 to −0.023), *P* = 0.034 |
+| Five evaluators, 10 case pairs (exact sign-flip), accuracy | −0.48, *P* = 0.043 |
+| Five evaluators, 10 case pairs (exact sign-flip), usefulness | −0.94, *P* = 0.0078 |
+| S-07 answers with a mg/mL leflunomide target | 25/39 RAG, 0/39 No-RAG |
+
+The expert pairs were selected after automated scoring, so the expert results indicate agreement with the LLM judges rather than an unbiased estimate of the configuration effect.
 
