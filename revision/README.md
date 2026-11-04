@@ -23,7 +23,7 @@ The runner executes these scripts in order:
 1. `finalize_statistics.py` creates all output-averaged, two-way model/case clustered results, six-dimension BH adjustments, ten-case exact sign-flip human results, subset analyses, and input hashes in `revision_statistics/`. It uses NumPy and pandas, not SciPy or R. **This internal analysis folder contains evaluator names** for source matching and should not be uploaded as the public expert dataset.
 2. `prepare_release_data.py` creates 100 deidentified expert ratings, 50 evaluator-case differences, ten case means, exact case-prompt copies, and the source counts used for Figure 7 in `revision_submission/data/`.
 3. `build_supplement_data.py` creates the typed S1–S4 matrices; `export_supplement_csvs.py` writes eight portable tables under `revision_submission/data/tables_csv/`.
-4. `build_figures.py` creates seven separate 300-dpi TIFF figures in `revision_submission/figures/`.
+4. `build_figures.py` creates the seven separate 300-dpi TIFF figures submitted with the revision (Arial, labels at least 8 pt) in `revision_submission/figures/`. Figure 7 reads the category rates in `s3_source.csv`, which sits next to the script.
 5. `build_prompt_supplement.py` extracts the current Bedrock, Ollama, and judge prompt templates into S6.
 6. `revision_addenda.py` prints the judge same-developer sensitivity analysis (Section 3.6) and the S-07 leflunomide unit counts (Section 3.7).
 

@@ -4,7 +4,7 @@ Reproducible analysis and manuscript code for a 39-model evaluation of retrieval
 
 ## Revision (PLOS Digital Health, PDIG-D-26-01326)
 
-The revised manuscript is titled "A Hybrid Retrieval-Augmented Generation Configuration Lowered Clinical Answer Quality Across 39 Language Models". The code for the revision analyses is in [`revision/`](revision/); see [`revision/README.md`](revision/README.md) for the run order. The revision data (deidentified ratings from five evaluators, revised statistics, and the retrieved-passage manifest and audit files) are archived at Zenodo: https://doi.org/10.5281/zenodo.23892698.
+The revised manuscript is titled "Hybrid Retrieval-Augmented Generation Was Associated With Lower Clinical Reasoning Quality in Transplant Infectious Disease". The code for the revision analyses is in [`revision/`](revision/); see [`revision/README.md`](revision/README.md) for the run order. The revision data (deidentified ratings from five evaluators, revised statistics, and the retrieved-passage manifest and audit files) are archived at Zenodo: https://doi.org/10.5281/zenodo.23892698.
 
 The revised analysis averages the three judge ratings within each answer and clusters standard errors by model and by case. It supersedes the inferential results of the original R pipeline below, which treated the three judge ratings of each answer as independent. The original generation, judging, and analysis scripts are kept unchanged for provenance. The comparison is between two complete configurations, which differed in prompts and answer format as well as retrieval.
 

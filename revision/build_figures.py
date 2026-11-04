@@ -7,16 +7,20 @@ import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
+for _font in ('/System/Library/Fonts/Supplemental/Arial.ttf', '/System/Library/Fonts/Supplemental/Arial Bold.ttf'):
+    if Path(_font).exists():
+        font_manager.fontManager.addfont(_font)
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'revision_submission' / 'figures'
-OUT.mkdir(exist_ok=True)
+OUT.mkdir(parents=True, exist_ok=True)
 STAT = ROOT / 'revision_statistics'
 BLUE, RED, GREEN, GREY, LINE = '#2c6e9b', '#c0392b', '#1a8a5a', '#999999', '#dddddd'
-plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 8, 'axes.titlesize': 8.5,
+plt.rcParams.update({'font.family': 'Arial', 'font.size': 8, 'axes.titlesize': 8.5,
                      'axes.titleweight': 'bold', 'axes.spines.top': False, 'axes.spines.right': False,
-                     'axes.grid': False, 'savefig.facecolor': 'white', 'legend.fontsize': 7})
+                     'axes.grid': False, 'savefig.facecolor': 'white', 'legend.fontsize': 8})
 
 
 def save(fig, n):
@@ -60,7 +64,7 @@ for i, d in enumerate(order):
     no, ra = dim_result.loc[d, 'mean_no_rag'], dim_result.loc[d, 'mean_rag']
     ax.plot([ra, no], [i, i], color=LINE, linewidth=2.5, zorder=1)
     ax.scatter(no, i, color=BLUE, s=38, zorder=2); ax.scatter(ra, i, color=RED, s=38, zorder=2)
-    ax.text(max(no, ra) + .06, i, stars(dim_result.loc[d, 'bh_q_six_dimensions']), va='center', fontsize=7, color='#444444')
+    ax.text(max(no, ra) + .06, i, stars(dim_result.loc[d, 'bh_q_six_dimensions']), va='center', fontsize=8, color='#444444')
 ax.set_yticks(range(6), [d.capitalize() for d in order]); ax.invert_yaxis(); ax.set_xlim(2.4, 5.1)
 ax.set_xlabel('Mean score (1–5 scale)'); ax.set_title('LLM-judge ratings by configuration', loc='left'); xgrid(ax)
 ax.scatter([], [], color=BLUE, s=30, label='No-RAG'); ax.scatter([], [], color=RED, s=30, label='RAG')
@@ -69,11 +73,11 @@ for i, d in enumerate(['usefulness', 'accuracy']):
     no, ra = human.loc[d, 'mean_no_rag'], human.loc[d, 'mean_rag']
     bx.plot([ra, no], [i, i], color=LINE, linewidth=2.5, zorder=1)
     bx.scatter(no, i, color=BLUE, s=38, zorder=2); bx.scatter(ra, i, color=RED, s=38, zorder=2)
-    bx.text(no + .07, i, stars(human.loc[d, 'exact_case_signflip_p']), va='center', fontsize=7, color='#444444')
-    bx.text(no, i + .22, f'{no:.2f}', ha='center', va='top', fontsize=7, color=BLUE)
-    bx.text(ra, i + .22, f'{ra:.2f}', ha='center', va='top', fontsize=7, color=RED)
-bx.set_yticks([0, 1], ['Usefulness', 'Accuracy']); bx.set_ylim(1.6, -.6); bx.set_xlim(2.5, 4.5)
-bx.set_xlabel('Mean rating (1–5 scale)'); bx.set_title('Expert ratings, ten case pairs', loc='left'); xgrid(bx); panel(bx, 'B')
+    bx.text(no + .07, i, stars(human.loc[d, 'exact_case_signflip_p']), va='center', fontsize=8, color='#444444')
+    bx.text(no, i + .22, f'{no:.2f}', ha='center', va='top', fontsize=8, color=BLUE)
+    bx.text(ra, i + .22, f'{ra:.2f}', ha='center', va='top', fontsize=8, color=RED)
+bx.set_yticks([0, 1], ['Usefulness', 'Accuracy']); bx.set_ylim(1.6, -.6); bx.set_xlim(2.4, 5.1)
+bx.set_xlabel('Mean rating (1–5 scale)'); bx.set_title('Expert ratings, ten selected pairs', loc='left'); xgrid(bx); panel(bx, 'B')
 save(fig, 1)
 
 # Figure 2: per-model composite quality difference, horizontal bars.
@@ -82,8 +86,8 @@ fig, ax = plt.subplots(figsize=(6.8, 7.6))
 yy = np.arange(len(m2))
 ax.barh(yy, m2.delta, height=.65, color=[GREEN if v > 0 else RED for v in m2.delta])
 for y, (name, v) in zip(yy, m2.delta.items()):
-    if v > 0: ax.text(v + .02, y, name, va='center', fontsize=6.5, color=GREEN)
-ax.axvline(0, color='#333333', linewidth=.8); ax.set_yticks(yy, m2.index, fontsize=7); ax.invert_yaxis()
+    if v > 0: ax.text(v + .02, y, name, va='center', fontsize=8, color=GREEN)
+ax.axvline(0, color='#333333', linewidth=.8); ax.set_yticks(yy, m2.index, fontsize=8); ax.invert_yaxis()
 ax.set_xlabel('RAG − No-RAG composite quality'); xgrid(ax)
 ax.set_title('Model-level differences in composite quality', loc='left')
 save(fig, 2)
@@ -100,13 +104,13 @@ fig, (ax, bx) = plt.subplots(1, 2, figsize=(7.4, 3.3), gridspec_kw={'wspace': .3
 left = 0
 for key, color, label in [('RAG', RED, 'RAG preferred'), ('Tie', GREY, 'Tie'), ('No RAG', BLUE, 'No-RAG preferred')]:
     n = int(pref.get(key, 0))
-    ax.barh(0, n, left=left, color=color, height=.6, label=label)
+    ax.barh(0, n, left=left, color=color, height=.5, label=label)
     ax.text(left + n / 2, 0, str(n), ha='center', va='center', color='white', fontweight='bold', fontsize=9)
     left += n
-ax.set_xlim(0, left); ax.set_ylim(-.45, 1.0); ax.set_yticks([]); ax.spines['left'].set_visible(False)
+ax.set_xlim(0, left); ax.set_ylim(-.6, .9); ax.set_yticks([]); ax.spines['left'].set_visible(False)
 ax.set_xlabel('Evaluator–case decisions (5 evaluators × 10 pairs)')
 handles, labels = ax.get_legend_handles_labels()
-ax.legend(handles[::-1], labels[::-1], loc='upper center', ncol=3, frameon=False, fontsize=6.5, handlelength=1.2, columnspacing=1)
+ax.legend(handles, labels, loc='upper center', ncol=3, frameon=False, fontsize=8, handlelength=1.2, columnspacing=1)
 ax.set_title('Paired preferences', loc='left'); panel(ax, 'A')
 for condition, color, label in [(False, BLUE, 'No-RAG'), (True, RED, 'RAG')]:
     part = paired[paired.RAG_MODEL == condition]
@@ -131,11 +135,11 @@ labels = {'DeepSeek-R1 8B': (8, 6), 'Nemotron Nano 12B': (8, 6), 'Jamba 1.5 Mini
 for name, (dx, dy) in labels.items():
     if name in model.index:
         ax.annotate(name, (model.loc[name, False], model.loc[name, 'delta']), xytext=(dx, dy),
-                    textcoords='offset points', fontsize=6.5, color='#333333',
+                    textcoords='offset points', fontsize=8, color='#333333',
                     arrowprops=dict(arrowstyle='-', color='#aaaaaa', linewidth=.6))
 r = np.corrcoef(model[False], model.delta)[0, 1]
 ax.text(.98, .97, f'Pearson r = {r:.2f}\n(descriptive; difference contains baseline)', transform=ax.transAxes,
-        ha='right', va='top', fontsize=7, bbox=dict(boxstyle='round', facecolor='white', edgecolor='#cccccc'))
+        ha='right', va='top', fontsize=8, bbox=dict(boxstyle='round', facecolor='white', edgecolor='#cccccc'))
 ax.set(xlabel='Baseline composite quality (No-RAG)', ylabel='RAG − No-RAG composite quality')
 ax.grid(axis='x', color=LINE, linewidth=.6); ax.set_axisbelow(True)
 ax.set_title('Baseline quality and observed configuration difference', loc='left')
@@ -146,7 +150,7 @@ rag = output[output.RAG_MODEL].groupby('model_name', as_index=False).mean(numeri
 metrics = [('evidence_density_per_100t', 'Citation density', 'Citations per 100 output tokens'),
            ('retrieval_alignment_score', 'Retrieval alignment', 'Retrieval alignment score'),
            ('gmkr', 'GMKR', 'General medical knowledge ratio'),
-           ('rur_total_citations', 'Retrieval utilization rate', 'Total citations')]
+           ('rur_total_citations', 'Total citations', 'Total citations per answer (model mean)')]
 fig, axes = plt.subplots(2, 2, figsize=(7.2, 6.0), gridspec_kw={'hspace': .55, 'wspace': .32})
 for ax, letter, (column, title, xlabel) in zip(axes.flat, 'ABCD', metrics):
     part = rag[[column, 'correctness']].dropna()
@@ -155,7 +159,7 @@ for ax, letter, (column, title, xlabel) in zip(axes.flat, 'ABCD', metrics):
     xs = np.linspace(part[column].min(), part[column].max(), 50)
     ax.plot(xs, a + b * xs, color=GREY, linewidth=1.2, zorder=1)
     r = np.corrcoef(part[column], part.correctness)[0, 1]
-    ax.text(.97, .95, f'r = {r:.2f}', transform=ax.transAxes, ha='right', va='top', fontsize=7,
+    ax.text(.97, .95, f'r = {r:.2f}', transform=ax.transAxes, ha='right', va='top', fontsize=8,
             bbox=dict(boxstyle='round', facecolor='white', edgecolor='#cccccc'))
     ax.set(xlabel=xlabel, ylabel='Correctness (mean)'); ax.set_title(title)
     xgrid(ax); panel(ax, letter)
@@ -174,24 +178,26 @@ for i in range(3):
     for j in range(3):
         ax.text(j, i, f'{corr[i, j]:.2f}', ha='center', va='center', fontsize=8,
                 color='white' if corr[i, j] > .85 else 'black')
-ax.set_xticks(range(3), short, fontsize=7); ax.set_yticks(range(3), short, fontsize=7)
+ax.set_xticks(range(3), short, fontsize=8); ax.set_yticks(range(3), short, fontsize=8)
 cb = fig.colorbar(im, ax=ax, fraction=.046, pad=.04); cb.set_label('Pearson r'); cb.ax.tick_params(labelsize=7)
-ax.set_title('Inter-judge agreement', loc='left'); panel(ax, 'A')
+ax.set_title('Inter-judge score correlations', loc='left'); panel(ax, 'A')
 xx = np.arange(3)
-bx.bar(xx, jr.estimate, width=.55, color=RED)
-bx.errorbar(xx, jr.estimate, yerr=[jr.estimate - jr.ci_low, jr.ci_high - jr.estimate], fmt='none', ecolor='#333333',
-            capsize=3, linewidth=.9)
-for x, v, lo in zip(xx, jr.estimate, jr.ci_low):
-    bx.text(x, lo - .025, f'{v:.3f}', ha='center', va='top', fontsize=7.5, color='#333333', fontweight='bold')
-bx.set_ylim(jr.ci_low.min() - .12, max(.08, jr.ci_high.max() + .03))
-bx.axhline(0, color='#333333', linewidth=.8); bx.set_xticks(xx, short, fontsize=7); bx.set_xlim(-.5, 2.5)
+bx.errorbar(xx, jr.estimate, yerr=[jr.estimate - jr.ci_low, jr.ci_high - jr.estimate], fmt='o', color=RED,
+            ecolor='#333333', markersize=6, capsize=3, linewidth=.9, zorder=3)
+for x, v in zip(xx, jr.estimate):
+    bx.text(x + .09, v, f'{v:.3f}', ha='left', va='center', fontsize=8, color='#333333', fontweight='bold')
+bx.set_ylim(jr.ci_low.min() - .06, max(.08, jr.ci_high.max() + .03))
+bx.axhline(0, color='#333333', linewidth=.8); bx.set_xticks(xx, short, fontsize=8); bx.set_xlim(-.5, 2.8)
 bx.set_ylabel('Δ composite quality (RAG − No-RAG)')
 bx.grid(axis='y', color=LINE, linewidth=.6); bx.set_axisbelow(True)
 bx.set_title('Judge-specific estimates (95% CI)', loc='left'); panel(bx, 'B')
 save(fig, 6)
 
 # Figure 7: original S3 category counts as descriptive rates; no inferential marks.
-s3 = pd.read_csv(ROOT / 'revision_submission' / 's3_source.csv')
+S3SRC = Path(__file__).resolve().parent / 's3_source.csv'
+if not S3SRC.exists():
+    print('s3_source.csv not found; Figure 7 not regenerated'); sys.exit(0)
+s3 = pd.read_csv(S3SRC)
 s3['change'] = s3.rate_RAG - s3.rate_NoRAG
 s3 = s3.sort_values('change')
 fig, ax = plt.subplots(figsize=(6.9, 4.4))
