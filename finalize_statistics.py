@@ -4,12 +4,13 @@ import hashlib
 import itertools
 import json
 from math import exp, lgamma, log
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('RAG_PROJECT_DIR', Path.cwd())).resolve()  # project folder; set RAG_PROJECT_DIR or run from it
 OUT = ROOT / 'revision_statistics'
 DIMENSIONS = ['correctness', 'completeness', 'reasoning', 'relevance', 'clarity', 'consistency']
 LLM_PATH = ROOT / 'data/all_models_rag_non_rag_judged.csv'

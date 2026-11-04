@@ -1,11 +1,12 @@
 """Prepare typed matrices for the new supplementary workbooks."""
+import os
 from pathlib import Path
 import json
 import numpy as np
 import pandas as pd
 import openpyxl
 
-ROOT=Path(__file__).resolve().parents[2]
+ROOT=Path(os.environ.get('RAG_PROJECT_DIR', Path.cwd())).resolve()
 OUT=ROOT/'revision_submission'
 STAT=ROOT/'revision_statistics'
 

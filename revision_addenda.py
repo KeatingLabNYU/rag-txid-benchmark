@@ -1,10 +1,11 @@
 """Second-round additions: judge same-developer sensitivity and the S-07 leflunomide unit count."""
+import os
 from pathlib import Path
 import re
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get('RAG_PROJECT_DIR', Path.cwd())).resolve()
 judge = pd.read_csv(ROOT / 'data/all_models_rag_non_rag_judged.csv')
 dimensions = ['correctness', 'completeness', 'reasoning', 'relevance', 'clarity', 'consistency']
 judge['quality'] = judge[dimensions].mean(axis=1)

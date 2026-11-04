@@ -1,11 +1,12 @@
 """Create deidentified supporting data and source table for reproducible figures."""
+import os
 from pathlib import Path
 import csv
 import shutil
 import pandas as pd
 import openpyxl
 
-root = Path(__file__).resolve().parents[2]
+root = Path(os.environ.get('RAG_PROJECT_DIR', Path.cwd())).resolve()
 submission = root / 'revision_submission'
 data = submission / 'data'
 data.mkdir(exist_ok=True)
@@ -30,9 +31,9 @@ case = pd.read_csv(stats / 'human_case_mean_differences.csv')
 case.loc[case.panel == 'combined_five'].drop(columns='panel').to_csv(
     data / 'case_mean_differences.csv', index=False)
 
-shutil.copyfile(root / 'rag-txid-benchmark-main' / 'complex_prompts.json',
+shutil.copyfile(Path(__file__).resolve().parent / 'complex_prompts.json',
                 data / 'acute_case_prompts.json')
-shutil.copyfile(root / 'rag-txid-benchmark-main' / 'simple_prompts.json',
+shutil.copyfile(Path(__file__).resolve().parent / 'simple_prompts.json',
                 data / 'surveillance_case_prompts.json')
 
 sheet = openpyxl.load_workbook(root / 'S3_Table.xlsx', read_only=True,

@@ -1,145 +1,80 @@
 # RAG vs No-RAG in Transplant Infectious Disease
 
-Reproducible analysis and manuscript code for a 39-model evaluation of retrieval-augmented generation (RAG) versus direct (no-RAG) generation in transplant infectious disease (Tx-ID), with LLM-judge scoring, masked clinician ratings, and retrieval quality audit.
+Code for a 39-model evaluation of a hybrid retrieval-augmented generation (RAG) configuration versus direct (No-RAG) generation on 21 transplant infectious disease cases, with LLM-judge scoring, masked clinician ratings, and a retrieval audit.
 
-## Revision (PLOS Digital Health, PDIG-D-26-01326)
+Manuscript: "Hybrid Retrieval-Augmented Generation Was Associated With Lower Clinical Reasoning Quality in Transplant Infectious Disease" (PLOS Digital Health, PDIG-D-26-01326, in revision). The comparison is between two complete configurations, which differed in prompts and answer format as well as retrieval.
 
-The revised manuscript is titled "Hybrid Retrieval-Augmented Generation Was Associated With Lower Clinical Reasoning Quality in Transplant Infectious Disease". The code for the revision analyses is in [`revision/`](revision/); see [`revision/README.md`](revision/README.md) for the run order. The revision data (deidentified ratings from five evaluators, revised statistics, and the retrieved-passage manifest and audit files) are archived at Zenodo: https://doi.org/10.5281/zenodo.23892698.
+Data: https://doi.org/10.5281/zenodo.23892698. The datasets are archived on Zenodo, not in this repository.
 
-The revised analysis averages the three judge ratings within each answer and clusters standard errors by model and by case. It supersedes the inferential results of the original R pipeline below, which treated the three judge ratings of each answer as independent. The original generation, judging, and analysis scripts are kept unchanged for provenance. The comparison is between two complete configurations, which differed in prompts and answer format as well as retrieval.
+## Contents
 
-## Repository structure
-
-### Analysis scripts
+### Generation and judging
 
 | File | Description |
 |---|---|
-| `RAG_TxID_analysis_FULL.R` | End-to-end statistical analysis pipeline. Generates all 7 figures and all tables (Sections 01–07). Run with `Rscript RAG_TxID_analysis_FULL.R`. |
-| `make_manuscript_figs.py` | Publication-quality figure generation (Figs 1–7) using matplotlib at 600 dpi. Outputs PNG + PDF to `figures/manuscript/`. |
+| `run_bedrock_model_with_RAG_metrics.py` | Hybrid RAG pipeline (BM25 + SapBERT + BGE reranker) for AWS Bedrock models; computes generation-time grounding metrics. |
+| `run_bedrock_model_without_RAG.py` | No-RAG generation for Bedrock models. |
+| `run_ollama_model_with_RAG_metrics.py` | Hybrid RAG pipeline for open-weight models served through Ollama. |
+| `run_ollama_model_NO_RAG.py` | No-RAG generation for Ollama models. |
+| `judge_all_models_multidim_csv.py` | Six-dimension LLM-judge scoring of model outputs (OpenAI, Gemini, and Anthropic judges). |
+| `error_taxonomy_irr.py` | Agreement between the keyword-coded judge-rationale categories and a second LLM coder (Cohen's κ). |
+| `document_processor.py` | PDF ingestion, chunking (1,500 characters, 100 overlap), and embedding of the 226-document corpus. |
+| `bedrock_manager.py`, `config.py` | Bedrock API wrapper and system configuration. |
+| `complex_prompts.json`, `simple_prompts.json` | The acute-management (A-01 to A-10) and surveillance/specialized (S-01 to S-11) case prompts. |
+| `setup_ollama_aws.md`, `setup_ollama_ec2.sh`, `submit_job_index_papers.sh` | Ollama setup on EC2 and corpus indexing on HPC. |
 
-**R pipeline sections:**
-- **01** — Setup, data ingestion, derived variables, theme & palette
-- **02** — Statistical inference: RAG effect (mixed models), Competence Paradox, Grounding Paradox, inter-rater reliability, human validation
-- **03** — Figures 1–3 (primary degradation, per-model effect, human validation)
-- **04** — Figures 4–6 (Competence Paradox, Grounding metrics, judge reliability) + Tables 1–3
-- **05** — Error taxonomy (requires PUBLICATION dataset): Figure 7, Table 4
-- **06** — Retrieval quality classification → Supplementary Table S4
-- **07** — Sensitivity analyses (good-retrieval subset; exclude poor-retrieval cases) + case-family subgroup (A vs S) → Supplementary Table S1
+These scripts were not rerun or modified for the revision.
 
-### Source data
-
-| File | Description |
-|---|---|
-| `all_models_rag_non_rag_judged.csv` | Complete LLM-judged dataset (4,911 rows, 23 columns incl. `answer` and `major_error_summary`). Required for all sections. |
-| `expert_evaluations_linked_long.csv` | Blinded clinician evaluations (60 rows). Required for human-validation analysis (Fig 3, Sec 02E). |
-| `retrieval_quality_classification.csv` | Per-case retrieval quality classification (5 categories, 21 cases) with quality deltas. Required for Sec 06/07. |
-| `complex_prompts.json` | The 21 complex clinical vignette prompts used in the benchmark. |
-| `simple_prompts.json` | The 21 simple clinical question prompts used in the benchmark. |
-
-### Output directories
-
-| Directory | Contents |
-|---|---|
-| `figures/manuscript/` | Publication figures Fig1–Fig7, each as PDF + PNG (600 dpi). Generated by `make_manuscript_figs.py`. |
-| `tables/` | All tables as CSV — see below. |
-
-### Tables
+### Analysis
 
 | File | Description |
 |---|---|
-| `Table1_model_leaderboard.csv` | Per-model No-RAG and RAG quality, correctness, major-error rates (39 models). |
-| `Table2_key_statistics.csv` | Omnibus statistics (primary analysis). |
-| `Table3_grounding_correlations.csv` | Grounding-metric × quality correlations. |
-| `Table4_error_taxonomy.csv` | Error taxonomy rates, ORs, Fisher *P*-values. |
-| `Table_S1_consolidated_statistics.csv` | **Supplementary S1:** All results including sensitivity analyses and subgroup analyses with 95% CIs. |
-| `Table_S2_grounding_correlations.csv` | **Supplementary S2:** Full grounding-metric correlation matrix. |
-| `Table_S3_error_taxonomy.csv` | **Supplementary S3:** Error taxonomy (same as Table 4, formatted for supplement). |
-| `Table_S4_retrieval_quality.csv` | **Supplementary S4:** Per-case retrieval quality audit (category, documents, similarity scores, quality by condition). |
-
-### Methods scripts
-
-These scripts implement the data collection pipeline described in the Methods section.
-
-| File | Description |
-|---|---|
-| `methods_scripts/run_bedrock_model_with_RAG_metrics.py` | Hybrid RAG pipeline (BM25 + SapBERT + BGE-reranker) for AWS Bedrock models; computes grounding metrics (GMKR, Retrieval Alignment Score, RUR, Evidence Density) at generation time. |
-| `methods_scripts/run_bedrock_model_without_RAG.py` | Direct (no-RAG) generation for Bedrock models. |
-| `methods_scripts/run_ollama_model_with_RAG_metrics.py` | Hybrid RAG pipeline for open-weight models served via Ollama. |
-| `methods_scripts/run_ollama_model_NO_RAG.py` | Direct (no-RAG) generation for Ollama models. |
-| `methods_scripts/judge_all_models_multidim_csv.py` | Multi-dimensional LLM judge scoring from a CSV of model outputs. Supports OpenAI, Gemini, and Anthropic judge providers. |
-| `methods_scripts/error_taxonomy_irr.py` | Inter-rater reliability (IRR) for error taxonomy coding. Classifies `major_error_summary` strings using a second LLM judge and computes Cohen's κ. |
-| `methods_scripts/document_processor.py` | PDF ingestion, chunking (1,500-char chunks, 100-char overlap), and embedding for the knowledge corpus. |
-| `methods_scripts/bedrock_manager.py` | Bedrock API abstraction layer (model configs, `converse` wrapper, reasoning-model output parser). |
-| `methods_scripts/config.py` | System configuration (embedding model, chunk sizes, top-k, temperature defaults). |
-| `methods_scripts/setup_ollama_aws.md` | Instructions for deploying Ollama on EC2. |
-| `methods_scripts/setup_ollama_ec2.sh` | EC2 Ollama setup and configuration script. |
-| `methods_scripts/submit_job_index_papers.sh` | SLURM job submission script for corpus indexing on HPC. |
+| `finalize_statistics.py` | Main analysis: judge ratings averaged within each answer, two-way model/case clustered inference, Benjamini–Hochberg adjustment of the six dimensions, retrieval subsets, and case-level exact sign-flip tests for the expert ratings. |
+| `revision_addenda.py` | Same-developer judge sensitivity analysis and the S-07 leflunomide unit counts. |
+| `prepare_release_data.py` | Deidentified expert ratings (E1–E5), case-level differences, and copies of the case prompts. |
+| `build_supplement_data.py`, `export_supplement_csvs.py` | S1–S4 table matrices and their CSV export. |
+| `make_manuscript_figs.py` | The seven 300-dpi TIFF figures (Arial, labels at least 8 pt). Figure 7 reads `s3_source.csv`. |
+| `build_prompt_supplement.py` | Extracts the generation and judge prompt templates from this repository into S6. |
+| `inspect_retrieved_passages.py` | Verifies retrieved passages against the exact-text hashes in the Zenodo manifest, given authorized access to the document cache. |
+| `run_core.ps1` | Runs the analysis scripts in order. |
+| `RAG_TxID_analysis_FULL.R` | Original-submission pipeline. Its significance tests treated the three judge ratings of each answer as independent and are superseded by `finalize_statistics.py`; its eleven-case filter also selected the wrong subset. It is kept because it produced the judge-rationale category counts used for S3 and Figure 7. |
 
 ## Reproduce
 
-### Statistical analysis (R)
-
-Requires R ≥ 4.3 with packages:
-```
-dplyr tidyr readr stringr forcats purrr tibble
-ggplot2 scales ggrepel patchwork
-lme4 lmerTest emmeans
-```
+The analysis scripts read inputs from a project folder containing `data/` (the Zenodo version 1 files), `revision_statistics/`, and the submitted supplementary tables. Set `RAG_PROJECT_DIR` to that folder or run the scripts from it. `finalize_statistics.py` also reads the two added evaluators' rating exports, which are not public; the expert analyses can be recomputed from `expert_ratings_deidentified.csv` in the Zenodo release.
 
 ```bash
-Rscript RAG_TxID_analysis_FULL.R
-```
-
-The script reads data from its own directory and writes `figures/manuscript/` and `tables/` relative to that directory. Override with environment variables:
-
-```bash
-RAG_DATA_DIR=/path/to/data RAG_OUT_DIR=/path/to/output Rscript RAG_TxID_analysis_FULL.R
-```
-
-The script auto-selects the first available dataset from a priority list (complete dataset preferred; FABLE subset reproduces Sections 01–04 only). The error taxonomy (Section 05 / Figure 7 / Table 4) and retrieval audit and sensitivity analyses (Sections 06–07) require the complete dataset (`all_models_rag_non_rag_judged.csv`).
-
-### Figures (Python)
-
-Requires Python ≥ 3.9:
-```bash
-pip install matplotlib numpy pandas scipy
+pip install -r requirements.txt
+export RAG_PROJECT_DIR=/path/to/project
+python finalize_statistics.py
+python prepare_release_data.py
+python build_supplement_data.py
+python export_supplement_csvs.py
 python make_manuscript_figs.py
+python build_prompt_supplement.py
+python revision_addenda.py
 ```
 
-Outputs `figures/manuscript/Fig1.{pdf,png}` … `Fig7.{pdf,png}` at 600 dpi.
+On Windows: `./run_core.ps1 -Python python -ProjectDir C:\path\to\project`.
 
-### RAG pipeline (Python)
+To inspect retrieved passages, see `retrieval/PASSAGE_ACCESS_GUIDE.md` in the Zenodo release. `inspect_retrieved_passages.py` takes `--manifest`, either `--cache` or `--passages-json`, `--output-dir`, and optionally `--case S-07`. The document cache is not public.
+
+The original R pipeline (R 4.3 or later with dplyr, tidyr, readr, stringr, forcats, purrr, tibble, ggplot2, scales, ggrepel, patchwork, lme4, lmerTest, and emmeans) runs with `Rscript RAG_TxID_analysis_FULL.R`; set `RAG_DATA_DIR` and `RAG_OUT_DIR` to change the input and output folders.
+
+### Generation and judging
 
 ```bash
 pip install haystack-ai sentence-transformers boto3 python-dotenv
+python run_bedrock_model_with_RAG_metrics.py --model claude-3-sonnet
+python run_bedrock_model_without_RAG.py --model claude-3-sonnet
+python judge_all_models_multidim_csv.py --input results.csv --outdir judged/ --judge_provider claude --judge_model <judge-model-id>
 ```
 
-Set AWS credentials via `~/.aws/credentials` profile or environment variables, then:
-
-```bash
-# RAG run (Bedrock)
-python methods_scripts/run_bedrock_model_with_RAG_metrics.py --model claude-3-sonnet
-
-# No-RAG run (Bedrock)
-python methods_scripts/run_bedrock_model_without_RAG.py --model claude-3-sonnet
-```
-
-See `methods_scripts/setup_ollama_aws.md` for Ollama (open-weight model) setup on EC2.
-
-### LLM judge
-
-```bash
-export ANTHROPIC_API_KEY="sk-ant-..."
-python methods_scripts/judge_all_models_multidim_csv.py \
-    --input results.csv \
-    --outdir judged/ \
-    --judge_provider claude \
-    --judge_model claude-opus-4-8
-```
+Set AWS credentials through `~/.aws/credentials` or environment variables. See `setup_ollama_aws.md` for the open-weight models.
 
 ## Key results
 
-Revised analysis (output-averaged; standard errors clustered by model and case). Superseded values from the original submission are not reproduced here.
+Judge ratings averaged within each answer; standard errors clustered by model and case.
 
 | Finding | Result |
 |---|---|
@@ -155,4 +90,3 @@ Revised analysis (output-averaged; standard errors clustered by model and case).
 | S-07 answers with a mg/mL leflunomide target | 25/39 RAG, 0/39 No-RAG |
 
 The expert pairs were selected after automated scoring, so the expert results indicate agreement with the LLM judges rather than an unbiased estimate of the configuration effect.
-

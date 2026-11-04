@@ -1,8 +1,9 @@
 """Extract the exact prompt templates currently present in the supplied source scripts."""
+import os
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[2]
-SRC=ROOT/'rag-txid-benchmark-main'
+ROOT=Path(os.environ.get('RAG_PROJECT_DIR', Path.cwd())).resolve()
+SRC=Path(__file__).resolve().parent  # generation and judge scripts in this repository
 OUT=ROOT/'revision_submission'/'S6_Prompt_templates_from_supplied_scripts.md'
 
 def template(file,marker):
