@@ -41,21 +41,26 @@ These scripts were not rerun or modified for the revision.
 
 ## Reproduce
 
-The analysis scripts read inputs from a project folder containing `data/` (the Zenodo version 1 files), `revision_statistics/`, and the submitted supplementary tables. Set `RAG_PROJECT_DIR` to that folder or run the scripts from it. `finalize_statistics.py` also reads the two added evaluators' rating exports, which are not public; the expert analyses can be recomputed from `expert_ratings_deidentified.csv` in the Zenodo release.
+Everything below runs from the public Zenodo files. Download the three CSV files and `revision_release_v2.zip` from https://doi.org/10.5281/zenodo.23892698, then arrange them in a project folder:
+
+```
+project/
+├── data/
+│   ├── all_models_rag_non_rag_judged.csv
+│   ├── expert_evaluations_linked_long.csv
+│   └── retrieval_quality_classification.csv
+└── revision_release_v2/        (unzipped)
+```
 
 ```bash
 pip install -r requirements.txt
 export RAG_PROJECT_DIR=/path/to/project
-python finalize_statistics.py
-python prepare_release_data.py
-python build_supplement_data.py
-python export_supplement_csvs.py
-python make_manuscript_figs.py
-python build_prompt_supplement.py
+python finalize_statistics.py     # writes revision_statistics/
+python make_manuscript_figs.py    # writes revision_submission/figures/
 python revision_addenda.py
 ```
 
-On Windows: `./run_core.ps1 -Python python -ProjectDir C:\path\to\project`.
+`finalize_statistics.py` uses the deidentified ratings in `revision_release_v2/revision_data/expert_ratings_deidentified.csv` (E1–E3 are the original evaluators, E4–E5 the two added specialists); set `RAG_EXPERT_RATINGS` to use another copy. The results match the published `revision_statistics/` files. `prepare_release_data.py`, `build_supplement_data.py`, `export_supplement_csvs.py`, and `build_prompt_supplement.py` rebuilt the released data and supplementary tables from the authors' internal files; their outputs are already in the Zenodo release. `run_core.ps1` runs the authors' full sequence, including those scripts, and needs the internal files.
 
 To inspect retrieved passages, see `retrieval/PASSAGE_ACCESS_GUIDE.md` in the Zenodo release. `inspect_retrieved_passages.py` takes `--manifest`, either `--cache` or `--passages-json`, `--output-dir`, and optionally `--case S-07`. The document cache is not public.
 

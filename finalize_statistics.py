@@ -20,6 +20,12 @@ HUMAN_PATH = ROOT / 'data/expert_evaluations_linked_long.csv'
 NEW_PATHS = [(ROOT / 'added_evaluator_1_ratings.csv', 'Added evaluator 1'),
              (ROOT / 'added_evaluator_2_ratings.csv', 'Added evaluator 2')]
 RETRIEVAL_PATH = ROOT / 'data/retrieval_quality_classification.csv'
+# Public route: without the two private exports, use the released deidentified ratings
+# (revision_release_v2.zip on Zenodo). E1-E3 are the original evaluators; E4-E5 were added.
+PUBLIC_RATINGS_CANDIDATES = [Path(p) for p in [os.environ.get('RAG_EXPERT_RATINGS', '')] if p] + [
+    ROOT / 'revision_data/expert_ratings_deidentified.csv',
+    ROOT / 'revision_release_v2/revision_data/expert_ratings_deidentified.csv']
+ORIGINAL_IDS, ADDED_IDS = ['E1', 'E2', 'E3'], ['E4', 'E5']
 
 def beta_cf(a, b, x):
     # Continued fraction for the regularized incomplete beta function.
@@ -112,6 +118,21 @@ def bh_adjust(pvalues):
         q[idx] = running
     return q
 
+def load_public_ratings():
+    path = next((p for p in PUBLIC_RATINGS_CANDIDATES if p.exists()), None)
+    if path is None:
+        raise FileNotFoundError('Expert ratings not found. Unzip revision_release_v2.zip from Zenodo into '
+                                'the project folder or set RAG_EXPERT_RATINGS to expert_ratings_deidentified.csv.')
+    data = pd.read_csv(path).rename(columns={'evaluator_id': 'evaluator_name'})
+    data['major_error'] = data.major_error.astype(str).str.lower().isin(['true', 'yes', '1'])
+    for column in ['evaluation_date', 'case_title', 'self_rated_expertise', 'comments', 'justification']:
+        data[column] = pd.NA
+    data['raw_source'] = path.name
+    if sorted(data.evaluator_name.unique()) != ORIGINAL_IDS + ADDED_IDS:
+        raise ValueError(f'{path.name}: expected evaluators E1-E5')
+    return path, data
+
+
 def human_panel(data, panel):
     cases = sorted(data.case_code.unique())
     n_evaluators = data.evaluator_name.nunique()
@@ -146,6 +167,7 @@ def human_panel(data, panel):
     return rows, case_pairs
 
 def main():
+    OUT.mkdir(parents=True, exist_ok=True)
     llm = pd.read_csv(LLM_PATH)
     expected = {'model_name','item_id','judge_model','RAG_MODEL','answer','has_major_error',*DIMENSIONS}
     if not expected.issubset(llm): raise ValueError('LLM columns missing')
@@ -198,38 +220,53 @@ def main():
             judge_rows.append(row)
     pd.DataFrame(judge_rows).to_csv(OUT/'judge_specific_results.csv',index=False,float_format='%.12g')
 
-    original = pd.read_csv(HUMAN_PATH)
-    original['major_error'] = original.major_error.astype(str).str.lower().eq('true')
-    mapping = original[['case_code','side','model_name','mode']].drop_duplicates()
-    if len(mapping)!=20 or mapping.duplicated(['case_code','side']).any():
-        raise ValueError('Original A/B condition mapping is not unique')
-    new_rows = []
-    for path,name in NEW_PATHS:
-        source = pd.read_csv(path)
-        if len(source)!=10 or set(source.case_code)!=set(mapping.case_code):
-            raise ValueError(f'{path.name}: incomplete ten-case evaluation')
-        for _,r in source.iterrows():
-            for side in ['a','b']:
-                new_rows.append({'evaluator_name':name,'evaluation_date':r.evaluation_date,
-                    'case_code':r.case_code,'case_title':r.case_title,
-                    'self_rated_expertise':r.self_rated_expertise,
-                    'preference':r.preference,'justification':r.justification,
-                    'side':side.upper(),'accuracy':r[f'response_{side}_accuracy'],
-                    'usefulness':r[f'response_{side}_usefulness'],
-                    'major_error':r[f'response_{side}_major_error']=='Yes',
-                    'comments':r[f'response_{side}_comments'], 'raw_source':path.name})
-    new = pd.DataFrame(new_rows).merge(mapping,on=['case_code','side'],how='left',validate='many_to_one')
-    if new[['model_name','mode']].isna().any().any() or len(new)!=40:
-        raise ValueError('New expert A/B mapping failed')
-    original['raw_source'] = HUMAN_PATH.name
-    all_human = pd.concat([original,new],ignore_index=True)
-    all_human = all_human[['evaluator_name','evaluation_date','case_code','case_title','model_name','side','mode',
-                           'accuracy','usefulness','major_error','preference','self_rated_expertise',
-                           'comments','justification','raw_source']]
-    if len(all_human)!=100 or all_human.evaluator_name.nunique()!=5:
-        raise ValueError('Five-expert panel dimensions incorrect')
-    if all_human.duplicated(['evaluator_name','case_code','side']).any():
-        raise ValueError('Duplicate evaluator-case-side row')
+    rating_inputs = [HUMAN_PATH, *[p for p, _ in NEW_PATHS]]
+    if all(p.exists() for p, _ in NEW_PATHS):
+        original = pd.read_csv(HUMAN_PATH)
+        original['major_error'] = original.major_error.astype(str).str.lower().eq('true')
+        mapping = original[['case_code','side','model_name','mode']].drop_duplicates()
+        if len(mapping)!=20 or mapping.duplicated(['case_code','side']).any():
+            raise ValueError('Original A/B condition mapping is not unique')
+        new_rows = []
+        for path,name in NEW_PATHS:
+            source = pd.read_csv(path)
+            if len(source)!=10 or set(source.case_code)!=set(mapping.case_code):
+                raise ValueError(f'{path.name}: incomplete ten-case evaluation')
+            for _,r in source.iterrows():
+                for side in ['a','b']:
+                    new_rows.append({'evaluator_name':name,'evaluation_date':r.evaluation_date,
+                        'case_code':r.case_code,'case_title':r.case_title,
+                        'self_rated_expertise':r.self_rated_expertise,
+                        'preference':r.preference,'justification':r.justification,
+                        'side':side.upper(),'accuracy':r[f'response_{side}_accuracy'],
+                        'usefulness':r[f'response_{side}_usefulness'],
+                        'major_error':r[f'response_{side}_major_error']=='Yes',
+                        'comments':r[f'response_{side}_comments'], 'raw_source':path.name})
+        new = pd.DataFrame(new_rows).merge(mapping,on=['case_code','side'],how='left',validate='many_to_one')
+        if new[['model_name','mode']].isna().any().any() or len(new)!=40:
+            raise ValueError('New expert A/B mapping failed')
+        original['raw_source'] = HUMAN_PATH.name
+        all_human = pd.concat([original,new],ignore_index=True)
+        all_human = all_human[['evaluator_name','evaluation_date','case_code','case_title','model_name','side','mode',
+                               'accuracy','usefulness','major_error','preference','self_rated_expertise',
+                               'comments','justification','raw_source']]
+        if len(all_human)!=100 or all_human.evaluator_name.nunique()!=5:
+            raise ValueError('Five-expert panel dimensions incorrect')
+        if all_human.duplicated(['evaluator_name','case_code','side']).any():
+            raise ValueError('Duplicate evaluator-case-side row')
+    else:
+        public_path, all_human = load_public_ratings()
+        rating_inputs = [public_path]
+        all_human = all_human[['evaluator_name','evaluation_date','case_code','case_title','model_name','side','mode',
+                               'accuracy','usefulness','major_error','preference','self_rated_expertise',
+                               'comments','justification','raw_source']]
+        original = all_human[all_human.evaluator_name.isin(ORIGINAL_IDS)]
+        new = all_human[all_human.evaluator_name.isin(ADDED_IDS)]
+        mapping = all_human[['case_code','side','model_name','mode']].drop_duplicates()
+        if len(mapping)!=20 or mapping.duplicated(['case_code','side']).any():
+            raise ValueError('Released A/B condition mapping is not unique')
+        if len(all_human)!=100:
+            raise ValueError('Five-expert panel dimensions incorrect')
     all_human.to_csv(OUT/'all_five_expert_ratings_linked.csv',index=False)
     panels = [('original_three',original),('two_id_specialists',new),('combined_five',all_human)]
     human_rows=[];paired=[];descriptive=[];case_rows=[]
@@ -273,7 +310,7 @@ def main():
     pd.DataFrame(blank_sensitivity).to_csv(OUT/'blank_answer_sensitivity.csv',index=False,float_format='%.12g')
 
     hashes = {path.name:hashlib.sha256(path.read_bytes()).hexdigest()
-              for path in [LLM_PATH,HUMAN_PATH,RETRIEVAL_PATH,*[p for p,_ in NEW_PATHS]]}
+              for path in [LLM_PATH,RETRIEVAL_PATH,*rating_inputs]}
     meta={'input_sha256':hashes,'llm_judge_records':len(llm),'llm_unique_outputs':len(output),
           'llm_rag_outputs':int(output.RAG_MODEL.sum()),'llm_no_rag_outputs':int((~output.RAG_MODEL).sum()),
           'missing_model_case_condition':'Cogito 70B, A-01, No-RAG (no output/ratings)',
